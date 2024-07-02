@@ -83,7 +83,10 @@ void    Server::Handle_Client_Data(int i, std::map<int, Client> &client)
 		if (nb_byte == -1)
 			return ((void)(std::cerr << RED << "ERROR : Read data on User Socket" << RESET << std::endl));
 		if (nb_byte == 0)
+		{
+			client.erase(fd);
 			Handle_Close_Connection(i);
+		}
 		else
 		{
 			client[fd].buffer[nb_byte -1] = 0;

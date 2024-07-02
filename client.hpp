@@ -6,7 +6,7 @@ class Client {
     int fd;
     char buffer[1024];
     bool auth;
-    std::string cmd;
+    std::string cmd[2];
     std::string username;
     std::string nickname;
 };
