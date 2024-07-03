@@ -39,11 +39,33 @@ std::string get_user(const std::string& cmd) {
     return result;
 }
 
+std::string trim(const std::string &str) {
+    // Trim leading whitespace
+    std::string::const_iterator start = str.begin();
+    while (start != str.end() && std::isspace(static_cast<unsigned char>(*start))) {
+        ++start;
+    }
+
+    // Trim trailing whitespace
+    std::string::const_iterator end = str.end();
+    do {
+        --end;
+    } while (end != start && std::isspace(static_cast<unsigned char>(*end)));
+
+    // If the entire string is whitespace, return an empty string
+    if (start == str.end()) {
+        return "";
+    } else {
+        return std::string(start, end + 1);
+    }
+}
+
 std::string get_message(std::string str)
 {
     std::string::size_type pos = str.find(':'); // Find the position of ':'
-    if (pos != std::string::npos) {
-        return str.substr(pos + 1); // Return substring after ':'
+    if (pos != std::string::npos && str.length() > pos + 1) {
+        return trim(str.substr(pos + 1));
+              // Return substring after ':'
     } else {
         return ""; // Return empty string if ':' is not found
     }
@@ -61,40 +83,42 @@ int fd_ofuser(std::string username, std::map<int, Client> client) {
 
 void send_message(int fd, std::map<int , Client> client)
 {
-   std::string username =  get_user(client[fd].buffer);
+   int fd_user =  fd_ofuser(client[fd].arg[1], client);
    std::string message = get_message(client[fd].buffer);
-   std::cerr <<"username" << username << std::endl;
-   std::cerr << "message" << message << std::endl;
-   int fd_user =  fd_ofuser(username, client);
-   send(fd_user, message.c_str(), message.length(), 0);
+   if(fd_user < 0)
+        send(fd, "USER NOT FOUND\n", 16, 0);
+   else if(message.empty())
+        send(fd, "NO MESSAGE\n", 12, 0);
+   else
+        send(fd_user, message.c_str(), message.length(), 0);
 }
 
-std::string seconde_arg(const std::string &str, int index) {
-    // Get the substring starting from the specified index
-    if (index >= static_cast<int>(str.length())) {
-        return "";
-    }
-    std::string sub = str.substr(index);
 
-    // Trim leading whitespace
-    std::string::const_iterator start = sub.begin();
-    while (start != sub.end() && std::isspace(static_cast<unsigned char>(*start))) {
-        ++start;
-    }
 
-    // Trim trailing whitespace
-    std::string::const_iterator end = sub.end();
-    do {
-        --end;
-    } while (end != start && std::isspace(static_cast<unsigned char>(*end)));
+std::vector<std::string> splitString(const std::string& str) {
+    std::vector<std::string> result;
+    if(str.empty())
+        return result;
+    std::istringstream iss(str);
+    std::string token;
 
-    // If the entire string is whitespace, return an empty string
-    if (start == sub.end()) {
-        return "";
+    while (iss >> token) {
+        result.push_back(token);
     }
 
-    // Construct the trimmed string
-    return std::string(start, end + 1);
+    return result;
+}
+
+bool check_cmd(int fd, std::map<int , Client> &client)
+{
+    if(client[fd].arg.size() > 3 && client[fd].arg[0] != "SEND")
+       return(send(fd, "TO MANY ARGUMENT\n" , 18, 0), false);
+    else if(client[fd].arg.size() < 3)
+        return(send(fd, "NOT ENOUGH ARGUMENTT\n", 21, 0), false);
+    int us = fd_ofuser(client[fd].arg[1], client);
+    if(us < 0)
+        return(send(fd, "USER NOT FOUND\n", 16, 0), false);
+    return true;
 }
 
 void parss_data(int fd, std::map<int,Client> &client)
@@ -137,52 +161,29 @@ void parss_data(int fd, std::map<int,Client> &client)
     }
     else 
     {
-        if (!strncmp(buffer,"SEND", 4))
+        client[fd].arg = splitString(buff);
+        std::string cmd = client[fd].arg[0];
+        bool check = check_cmd(fd, client);
+        if (cmd == "SEND")
         {
-            std::cerr << "is in \n";
-            client[fd].cmd[0] = "SEND";
-            client[fd].cmd[1] = seconde_arg(buff, sizeof("JOIN"));
-            if(client[fd].cmd[1].empty())
-                send(fd, "NO ARGUMENT\n", 13, 0);
-            else
-                send_message(fd, client);
+            send_message(fd, client);
         }
-       else if(!strncmp(buffer,"JOIN", 4))
+       else if(cmd == "JOIN" && check)
         {
-            client[fd].cmd[0] = "JOIN";
-            client[fd].cmd[1] =  seconde_arg(buff, sizeof("JOIN"));
-             if(client[fd].cmd[1].empty())
-                send(fd, "NO ARGUMENT\n", 13, 0);
         }
-       else if(!strncmp(buffer,"KICK", 4))
+       else if(cmd == "KICK" && check)
         {
-            client[fd].cmd[0] = "KICK";
-            client[fd].cmd[1] = seconde_arg(buff, sizeof("KICK"));
-             if(client[fd].cmd[1].empty())
-                send(fd, "NO ARGUMENT\n", 13, 0);
         }
-       else if(!strncmp(buffer,"INVITE", 6))
+       else if(cmd == "INVITE" && check)
         {
-            client[fd].cmd[0] = "INVITE";
-            client[fd].cmd[1] = seconde_arg(buff, sizeof("INVITE"));
-             if(client[fd].cmd[1].empty())
-                send(fd, "NO ARGUMENT\n", 13, 0);
         }
-       else if(!strncmp(buffer,"TOPIC", 5))
+       else  if(cmd == "TOPIC" && check)
         {
-            client[fd].cmd[0] = "TOPIC";
-            client[fd].cmd[1] = seconde_arg(buff, sizeof("TOPIC"));
-             if(client[fd].cmd[1].empty())
-                send(fd, "NO ARGUMENT\n", 13, 0);
         }
-      else  if(!strncmp(buffer,"MODE", 4))
+        else if(cmd == "MODE" && check)
         {
-            client[fd].cmd[0] = "MODE";
-            client[fd].cmd[1] = seconde_arg(buff, sizeof("MODE"));
-             if(client[fd].cmd[1].empty())
-                send(fd, "NO ARGUMENT\n", 13, 0);
         }
-        else
-            send(fd, "COMMAND NOT FOUND\n", 19, 0);
+        else if(!check)
+            std::cerr << "not";
     }
 }
