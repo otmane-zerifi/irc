@@ -64,7 +64,7 @@ std::string get_message(std::string str)
 {
     std::string::size_type pos = str.find(':'); // Find the position of ':'
     if (pos != std::string::npos && str.length() > pos + 1) {
-        return trim(str.substr(pos + 1));
+        return trim(str.substr(pos + 1)) + "\n";
               // Return substring after ':'
     } else {
         return ""; // Return empty string if ':' is not found
@@ -109,15 +109,61 @@ std::vector<std::string> splitString(const std::string& str) {
     return result;
 }
 
+bool check_mode(std::map<int, Client> client, int fd)
+{
+    std::string option[10] = {"i+" , "i-", "l+", "l-",\
+     "k+", "k-", "o+", "o-", "t+", "t-"};
+    if(client[fd].arg.size() > 4)
+        return(send(fd, "TO MANY ARGUMENT\n", 18, 0), false);
+    if(client[fd].arg.size() < 4)
+        return(send(fd, "NOT ENOUGH ARGUMENT\n", 21, 0) , false);
+    for(int i = 0; i < 11; i++)
+    {
+        if(option[i] == client[fd].arg[1])
+        {
+            int user = fd_ofuser(client[fd].arg[2], client);
+            if(user < 0)
+                return(send(fd, "USER NOT FOUND\n", 16, 0), false);
+            else
+                return(true);
+        }
+    }
+    return (send(fd, "OPTION NOT FOUND\n",18, 0) ,false);
+}
+
 bool check_cmd(int fd, std::map<int , Client> &client)
 {
-    if(client[fd].arg.size() > 3 && client[fd].arg[0] != "SEND")
+    if(client[fd].arg.empty())
+        return(false);
+    std::string cmds[6] = {"SEND", "JOIN", "KICK", "INVITE", "TOPIC", "MODE"};
+    bool check =true;
+    for(int i =0; i < 6; i++)
+    {
+    if(client[fd].arg[0] == "MODE")
+        return (check_mode(client, fd));
+    if(client[fd].arg[0] == "JOIN")
+    {
+        if(client[fd].arg.size() > 2)
+            return(send(fd, "TO MANY ARGUMENT\n" , 18, 0), false);
+        else if(client[fd].arg.size() < 2)
+            return(send(fd, "NOT ENOUGH ARGUMENT\n", 21, 0), false);
+        return (true);
+    }
+    else if(cmds[i] == client[fd].arg[0])
+    {
+    if(client[fd].arg.size() > 3 && client[fd].arg[0] != "SEND" && client[fd].arg[0] != "MODE")
        return(send(fd, "TO MANY ARGUMENT\n" , 18, 0), false);
     else if(client[fd].arg.size() < 3)
-        return(send(fd, "NOT ENOUGH ARGUMENTT\n", 21, 0), false);
+        return(send(fd, "NOT ENOUGH ARGUMENT\n", 21, 0), false);
     int us = fd_ofuser(client[fd].arg[1], client);
     if(us < 0)
         return(send(fd, "USER NOT FOUND\n", 16, 0), false);
+    check = false;
+    break;
+    }
+    }
+    if(check)
+        return(send(fd, "COMMAND NOT FOUND\n", 19, 0), false);
     return true;
 }
 
@@ -152,7 +198,7 @@ void parss_data(int fd, std::map<int,Client> &client)
     else if(client[fd].auth && client[fd].username.empty() && *buffer != 0 && double_user(fd, client))
     {
         client[fd].username = client[fd].buffer;
-        send(fd, "\033[1;32mENTER YOUR NIKENAME:",29, 0);
+        send(fd, "\033[1;32mENTER YOUR NIKENAME:", 28 , 0);
     }
     else if(client[fd].auth && client[fd].nickname.empty() && *buffer != 0 && !client[fd].username.empty())
     {
@@ -161,10 +207,18 @@ void parss_data(int fd, std::map<int,Client> &client)
     }
     else 
     {
+        std::string cmd;
         client[fd].arg = splitString(buff);
-        std::string cmd = client[fd].arg[0];
+        if(!client[fd].arg.empty())
+        {
+            cmd = client[fd].arg[0];
+            for(int i= 0; i < static_cast<int>(client[fd].arg.size()); i++)
+            {
+                std::cerr << std::endl << "argument " << i  << ": " << client[fd].arg[i] <<  std::endl;
+            }
+        }
         bool check = check_cmd(fd, client);
-        if (cmd == "SEND")
+        if (cmd == "SEND" && check)
         {
             send_message(fd, client);
         }
@@ -183,7 +237,5 @@ void parss_data(int fd, std::map<int,Client> &client)
         else if(cmd == "MODE" && check)
         {
         }
-        else if(!check)
-            std::cerr << "not";
     }
 }
