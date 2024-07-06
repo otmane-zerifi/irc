@@ -120,13 +120,7 @@ bool check_mode(std::map<int, Client> client, int fd)
     for(int i = 0; i < 11; i++)
     {
         if(option[i] == client[fd].arg[1])
-        {
-            int user = fd_ofuser(client[fd].arg[2], client);
-            if(user < 0)
-                return(send(fd, "USER NOT FOUND\n", 16, 0), false);
-            else
                 return(true);
-        }
     }
     return (send(fd, "OPTION NOT FOUND\n",18, 0) ,false);
 }
@@ -155,9 +149,6 @@ bool check_cmd(int fd, std::map<int , Client> &client)
        return(send(fd, "TO MANY ARGUMENT\n" , 18, 0), false);
     else if(client[fd].arg.size() < 3)
         return(send(fd, "NOT ENOUGH ARGUMENT\n", 21, 0), false);
-    int us = fd_ofuser(client[fd].arg[1], client);
-    if(us < 0)
-        return(send(fd, "USER NOT FOUND\n", 16, 0), false);
     check = false;
     break;
     }
@@ -167,7 +158,7 @@ bool check_cmd(int fd, std::map<int , Client> &client)
     return true;
 }
 
-void parss_data(int fd, std::map<int,Client> &client)
+void parss_data(int fd, std::map<int,Client> &client, std::string password)
 {
     char *buffer = client[fd].buffer;
     std::string buff = client[fd].buffer;
@@ -188,9 +179,9 @@ void parss_data(int fd, std::map<int,Client> &client)
         RESET; // Green
     
     std::cerr << "fd " << fd << client[fd].username;
-    if(!client[fd].auth && strcmp(buffer, PASSWORD))
+    if(!client[fd].auth && buff != password)
         send(fd, "\033[31m INCORRECT PASSWORD\n", 26, 0);
-    else if(!client[fd].auth && !strcmp(buffer, PASSWORD))
+    else if(!client[fd].auth && buff == password)
     {
         client[fd].auth = true;
         send(fd, "\033[1;32mWELCOM TO IRC SERVER\nENTER YOUR USERNAME:", 49, 0);

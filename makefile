@@ -1,5 +1,5 @@
 
-NAME = server
+NAME = ircserv
 COMPI = c++ -std=c++98
 ERRORS = -Wall -Wextra -Werror -g
 

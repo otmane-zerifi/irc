@@ -14,6 +14,7 @@
 #include <vector>
 #include <cerrno>
 #include "client.hpp"
+#include <cstdlib>
 
 # define RED "\033[31m"
 # define GREEN "\033[32m"
@@ -23,7 +24,6 @@
 # define CYAN "\033[36m"
 # define RESET "\033[0m"
 # define WHITE "\033[37m"
-# define PASSWORD "soso+"
 class Server {
 private :
     int						        Server_Socket;

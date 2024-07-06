@@ -15,7 +15,7 @@ class Client {
     std::string username;
     std::string nickname;
 };
-void parss_data(int fd, std::map<int, Client> &client);
+void parss_data(int fd, std::map<int, Client> &client, std::string pass);
 int fd_ofuser(std::string username, std::map<int, Client> client);
 void send_message(int fd, std::map<int , Client> client);
 std::string get_user(const std::string& cmd);
