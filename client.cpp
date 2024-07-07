@@ -111,11 +111,18 @@ std::vector<std::string> splitString(const std::string& str) {
 
 bool check_mode(std::map<int, Client> client, int fd)
 {
-    std::string option[10] = {"i+" , "i-", "l+", "l-",\
-     "k+", "k-", "o+", "o-", "t+", "t-"};
-    if(client[fd].arg.size() > 4)
+    std::string option[10] = {"+i" , "-i", "+l", "-l",\
+     "+k", "-k", "+o", "-o", "+t", "-t"};
+    int size = client[fd].arg.size();
+    if(size >= 2 && (client[fd].arg[1] == "+o" || client[fd].arg[1] == "-o"))
+    {
+    if(size > 4 || size < 4)
+       send(fd, "Usage: MODE +o/-o user channel\n", 32, 0);
+    return(true);
+    }
+    if(client[fd].arg.size() > 3)
         return(send(fd, "TO MANY ARGUMENT\n", 18, 0), false);
-    if(client[fd].arg.size() < 4)
+    if(client[fd].arg.size() < 3)
         return(send(fd, "NOT ENOUGH ARGUMENT\n", 21, 0) , false);
     for(int i = 0; i < 11; i++)
     {
