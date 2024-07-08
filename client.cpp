@@ -165,27 +165,36 @@ bool check_cmd(int fd, std::map<int , Client> &client)
     return true;
 }
 
+
+
+void send_command_table(int client_fd) {
+       const char* messages = 
+        "<<<<<<<<<<<<<<COMMAND>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\n"
+        BRIGHT_RED"* JOIN   - Join a channel\n" RESET
+        BRIGHT_RED"* KICK   - Eject a client from the channel\n" RESET
+        BRIGHT_GREEN"∗ INVITE - Invite a client to a channel\n" RESET
+        BRIGHT_YELLOW"∗ TOPIC  - Change or view the channel topic\n" RESET
+        BRIGHT_BLUE"∗ MODE   - Change the channel’s mode:\n" RESET
+        BRIGHT_MAGENTA"  · i: Set/remove Invite-only channel\n" RESET
+        BRIGHT_CYAN"  · t: Set/remove the restrictions of the TOPIC command to channel operators\n" RESET
+        WHITE"  · k: Set/remove the channel key (password)\n" RESET
+        RED"  · o: Give/take channel operator privilege\n" RESET
+        GREEN"  · l: Set/remove the user limit to channel\n" RESET
+        BRIGHT_BLUE"  Usage examples:\n" RESET
+        BRIGHT_BLUE"    /mode #channel +i or /mode #channel -i\n" RESET
+        BRIGHT_BLUE"    /mode #channel +t or /mode #channel -t\n" RESET
+        BRIGHT_BLUE"    /mode #channel +k <key> or /mode #channel -k\n" RESET
+        BRIGHT_BLUE"    /mode #channel +o <username> or /mode #channel -o <username>\n" RESET
+        BRIGHT_BLUE"    /mode #channel +l <limit> or /mode #channel -l\n" RESET
+        BRIGHT_GREEN"SEND    : Send message to other client, username:'your message'\n" RESET;
+
+    send(client_fd, messages, 1018, 0);
+}
+
 void parss_data(int fd, std::map<int,Client> &client, std::string password)
 {
     char *buffer = client[fd].buffer;
     std::string buff = client[fd].buffer;
-    std::cerr << "buff " << buff << std::endl;
-    const char* messages = 
-        "<<<<<<<<<<<<<<COMMAND>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\n"
-        RED"* JOIN   - join a channel\n"
-        RED"* KICK   - Eject a client from the channel\n" // Red
-        "\033[1;32m∗ INVITE - Invite a client to a channel\n" // Green
-        "\033[1;33m∗ TOPIC  - Change or view the channel topic\n" // Yellow
-        "\033[1;34m∗ MODE   - Change the channel’s mode:\n" // Blue
-        "\033[1;35m· i: Set/remove Invite-only channel\n" // Magenta
-        "\033[1;36m· t: Set/remove the restrictions of the TOPIC command to channel operators\n" // Cyan
-        "\033[1;37m· k: Set/remove the channel key (password)\n" // White
-        "\033[1;31m· o: Give/take channel operator privilege\n" // Red
-        "\033[1;32m· l: Set/remove the user limit to channel\n"
-        BLUE "SEND    : send message to other client , username:'your message'\n"
-        RESET; // Green
-    
-    std::cerr << "fd " << fd << client[fd].username;
     if(!client[fd].auth && buff != password)
         send(fd, "\033[31m INCORRECT PASSWORD\n", 26, 0);
     else if(!client[fd].auth && buff == password)
@@ -201,7 +210,7 @@ void parss_data(int fd, std::map<int,Client> &client, std::string password)
     else if(client[fd].auth && client[fd].nickname.empty() && *buffer != 0 && !client[fd].username.empty())
     {
         client[fd].nickname = client[fd].buffer;
-        send(fd, messages, 634, 0);
+        send_command_table(fd);
     }
     else 
     {

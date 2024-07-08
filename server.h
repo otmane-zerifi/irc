@@ -24,6 +24,13 @@
 # define CYAN "\033[36m"
 # define RESET "\033[0m"
 # define WHITE "\033[37m"
+#define MAGENTA "\033[1;35m"
+#define BRIGHT_RED "\033[1;91m"
+#define BRIGHT_GREEN "\033[1;92m"
+#define BRIGHT_YELLOW "\033[1;93m"
+#define BRIGHT_BLUE "\033[1;94m"
+#define BRIGHT_MAGENTA "\033[1;95m"
+#define BRIGHT_CYAN "\033[1;96m"
 class Server {
 private :
     int						        Server_Socket;
