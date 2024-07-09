@@ -116,7 +116,11 @@ int	Server::Multiplexing()
 		for (int i = 0; i < num_event; i ++)
 		{
 			if (Events[i].data.fd == Server_Socket)
-				client[Handle_New_Connection()].auth = false;
+			{
+				int nm = Handle_New_Connection();
+				if(nm > 0)
+					client[nm].auth = false;
+			}
 			else
 				Handle_Client_Data(i, client);
 		}
