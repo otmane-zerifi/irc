@@ -74,13 +74,15 @@ void    Server::Handle_Close_Connection(int i)
 	std::cout << BLUE << "ERROR : Connection of Client closed" <<  RESET << std::endl;
 }
 
-void    Server::Handle_Client_Data(int i, std::map<int, Client> &client)
+void    Server::Handle_Client_Data(int i, std::map<int, Client> &client, std::map<std::string, Chanel> &chanels)
 {
 	int fd = Events[i].data.fd;
 	if (Events[i].events & EPOLLIN)
 	{
+		std::cout <<"------------- " << std::endl;
+		memset(client[fd].buffer, 0, sizeof(client[fd].buffer));
 		int nb_byte = read(Events[i].data.fd, client[fd].buffer, 1024);
-		if (nb_byte == -1)
+		if (nb_byte < 0)
 			return ((void)(std::cerr << RED << "ERROR : Read data on User Socket" << RESET << std::endl));
 		if (nb_byte == 0)
 		{
@@ -89,16 +91,27 @@ void    Server::Handle_Client_Data(int i, std::map<int, Client> &client)
 		}
 		else
 		{
-			client[fd].buffer[nb_byte -1] = 0;
-			parss_data(Events[i].data.fd, client, password);
-			// std::cout << client[fd].buffer ;
+			client[fd].buffer[nb_byte] = 0;
+			std::string data(client[fd].buffer);
+			client[fd].buff += data;
+			size_t n =  client[fd].buff.find('\n');
+			std::cerr << "n = " << n << std::endl;
+			if(!client[fd].buff.empty() && n != std::string::npos)
+			{
+			client[fd].buff = client[fd].buff.substr(0, n);
+			parss_data(Events[i].data.fd, client, password, chanels);
+			client[fd].buff.clear();
+			}
 		}
 	}
+			// std::cout << client[fd].buffer ;
 }
 
 int	Server::Multiplexing()
 {
 	std::map<int, Client> client;
+	std::map<std::string, Chanel> chanels;
+
 	epoll_fd = epoll_create1(0);
 	if (epoll_fd == -1)
 		return (std::cerr << RED <<"ERROR : Create EPOLL" << RESET <<std::endl, -1);
@@ -122,7 +135,7 @@ int	Server::Multiplexing()
 					client[nm].auth = false;
 			}
 			else
-				Handle_Client_Data(i, client);
+				Handle_Client_Data(i, client, chanels);
 		}
 	}
 	return (1);

@@ -1,26 +1,29 @@
 #ifndef CLIENT_HPP
 #define CLIENT_HPP
+#include "channel.h"
 #include <iostream>
 #include <ctime>
 #include <sstream>
 #include <vector>
 #include <string>
 #include <map>
+
 class Client {
     public :
     int fd;
     char buffer[1024];
     bool auth;
     std::vector<std::string> arg;
-    std::string cmd[2];
+    std::string buff;
     std::string username;
     std::string nickname;
 };
+
 bool isValidnick(int fd, std::string nickname);
 std::string getTimestamp();
 bool isValidChar(char c);
 bool isValiduser(const std::string& user);
-void parss_data(int fd, std::map<int, Client> &client, std::string pass);
+void parss_data(int fd, std::map<int, Client> &client, std::string pass , std::map<std::string, Chanel> &chanels);
 int fd_ofuser(std::string username, std::map<int, Client> client);
 void send_message(int fd, std::map<int , Client> client);
 std::string get_user(const std::string& cmd);

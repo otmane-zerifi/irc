@@ -15,6 +15,7 @@
 #include <cerrno>
 #include "client.hpp"
 #include <cstdlib>
+#include "channel.h"
 
 # define RED "\033[31m"
 # define GREEN "\033[32m"
@@ -31,6 +32,7 @@
 #define BRIGHT_BLUE "\033[1;94m"
 #define BRIGHT_MAGENTA "\033[1;95m"
 #define BRIGHT_CYAN "\033[1;96m"
+
 class Server {
 private :
     int						        Server_Socket;
@@ -54,8 +56,9 @@ public :
     int		Listen();
     int     Setup_Sever();
     int     Multiplexing();
-    int   Handle_New_Connection();
-    void    Handle_Client_Data(int i,std::map<int, Client> &client);
+    int     Handle_New_Connection();
+    void    Handle_Client_Data(int i, std::map<int, Client> &client, \
+            std::map<std::string, Chanel> &chanels);
     void    Handle_Close_Connection(int i);
     ~Server();
 };

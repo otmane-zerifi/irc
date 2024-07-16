@@ -1,9 +1,9 @@
 
 NAME = ircserv
 COMPI = c++ -std=c++98
-ERRORS = -Wall -Wextra -Werror -g
+ERRORS = #-Wall -Wextra -Werror -g
 
-CPP_FILES = server.cpp ft_irc.cpp client.cpp
+CPP_FILES = server.cpp ft_irc.cpp client.cpp chanel.cpp
 
 all : $(NAME)
 
