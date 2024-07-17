@@ -124,7 +124,7 @@ void send_message(int fd, std::map<int , Client> client)
         return ;
     }
    int fd_user =  fd_ofuser(client[fd].arg[1], client);
-   std::string message = get_message(client[fd].buffer);
+   std::string message = "message from @" + client[fd].arg[1]  + " :" + get_message(client[fd].buffer);
    if(fd_user < 0)
         send(fd, "USER NOT FOUND\n", 16, 0);
    else if(message.empty())
@@ -292,13 +292,21 @@ void parss_data(int fd, std::map<int,Client> &client, std::string password, std:
         bool check = check_cmd(fd, client);
         if (cmd == "SEND" && check)
         {
-            if (chanels.find(client[fd].arg[1]) != chanels.end())
+            if(fd_ofuser(client[fd].username, client) < 0)
+                send_message(fd, client);
+            else if (Check_Existng_Chanel(client[fd].arg[1], chanels))
             {
-                chanels.find(client[fd].arg[1])->second.Broadcast_message(client[fd].arg[3], client);
+                if(chanels.find(client[fd].arg[1])->second.Check_UserOnChanel(fd))
+                {
+                    std::string msg = "-->\nmessage from @" + client[fd].username + " in channel #" + client[fd].arg[1] + " :" + client[fd].arg[3] + "\n";
+                    chanels.find(client[fd].arg[1])->second.Broadcast_message(msg, client);
+                }
+                else
+                    send(fd, "YOU ARE NOT IN THIS CHANNEL , JOIN IT\n", 39, 0);
             }
+            else 
+                send(fd, "INVALIDE ADDRESSEE\n", 20, 0);
             // problem ui on send on client ui 
-            else
-            send_message(fd, client);
         }
         else if(cmd == "JOIN" && check)
         {
