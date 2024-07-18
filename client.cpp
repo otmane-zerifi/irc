@@ -187,9 +187,9 @@ bool check_cmd(int fd, std::map<int , Client> &client)
 {
     if(client[fd].arg.empty())
         return(false);
-    std::string cmds[6] = {"SEND", "JOIN", "KICK", "INVITE", "TOPIC", "MODE"};
+    std::string cmds[8] = {"SEND", "JOIN", "KICK", "INVITE", "TOPIC", "MODE", "USER", "NICK"};
     bool check =true;
-    for(int i =0; i < 6; i++)
+    for(int i =0; i < 8; i++)
     {
     if(client[fd].arg[0] == "MODE")
         return (check_mode(client, fd));
@@ -205,7 +205,7 @@ bool check_cmd(int fd, std::map<int , Client> &client)
     {
     if(client[fd].arg.size() > 3 && client[fd].arg[0] != "SEND" && client[fd].arg[0] != "MODE")
        return(send(fd, "TO MANY ARGUMENT\n" , 18, 0), false);
-    else if(client[fd].arg.size() < 3)
+    else if(client[fd].arg.size() < 3 && client[fd].arg[0] != "USER" && client[fd].arg[0] != "NICK")
         return(send(fd, "NOT ENOUGH ARGUMENT\n", 21, 0), false);
     check = false;
     break;
@@ -231,6 +231,8 @@ void send_command_table(int client_fd, std::string user) {
     oss << "---------------|----------------------------------------|---------------------------\n";
 
     // Command Table Rows
+    oss << BLUE <<      "USER           " << RESET << "| set username                        " << RESET << "   | USER (username)     \n";
+    oss << WHITE <<      "NICK           " << RESET << "| set nickname                           " << RESET << "| NICK (nickname)     \n";
     oss << BRIGHT_RED << "JOIN           " << RESET << "| Join a channel                        " << RESET << " | join #channel / join #channel #password\n";
     oss << BRIGHT_RED << "KICK           " << RESET << "| Eject a client from the channel       " << RESET << " | kick #username #channel\n";
     oss << BRIGHT_GREEN << "INVITE         " << RESET << "| Invite a client to a channel          " << RESET << " | invite #username #channel\n";
@@ -292,7 +294,7 @@ void parss_data(int fd, std::map<int,Client> &client, std::string password, std:
         bool check = check_cmd(fd, client);
         if (cmd == "SEND" && check)
         {
-            if(fd_ofuser(client[fd].username, client) < 0)
+            if(fd_ofuser(client[fd].username, client) > 0)
                 send_message(fd, client);
             else if (Check_Existng_Chanel(client[fd].arg[1], chanels))
             {
@@ -307,6 +309,26 @@ void parss_data(int fd, std::map<int,Client> &client, std::string password, std:
             else 
                 send(fd, "INVALIDE ADDRESSEE\n", 20, 0);
             // problem ui on send on client ui 
+        }
+        else if(cmd == "USER")
+        {
+            int nb = client[fd].arg.size();
+            if(nb > 2)
+                send(fd, "TO MANY ARGUMENT\n", 18,0);
+            else if(nb < 2)
+                send(fd, "NOT ENOUGH ARGUMENT\n", 21, 0);
+            else
+                client[fd].username = client[fd].arg[1];
+        }
+        else if(cmd == "NICK" && check)
+        {
+            int nb = client[fd].arg.size();
+            if(nb > 2)
+                send(fd, "TO MANY ARGUMENT\n", 18,0);
+            else if(nb < 2)
+                send(fd, "NOT ENOUGH ARGUMENT\n", 21, 0);
+            else
+                client[fd].nickname = client[fd].arg[1];
         }
         else if(cmd == "JOIN" && check)
         {
