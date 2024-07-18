@@ -294,7 +294,7 @@ void parss_data(int fd, std::map<int,Client> &client, std::string password, std:
         bool check = check_cmd(fd, client);
         if (cmd == "SEND" && check)
         {
-            if(fd_ofuser(client[fd].username, client) > 0)
+            if(fd_ofuser(client[fd].arg[1], client) >= 0)
                 send_message(fd, client);
             else if (Check_Existng_Chanel(client[fd].arg[1], chanels))
             {
