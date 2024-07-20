@@ -29,7 +29,7 @@ void send_message(int fd, std::map<int , Client> client);
 std::string get_user(const std::string& cmd);
 void trim(std::string& str);
 std::vector<std::string> splitString(const std::string& str);
-bool check_user(int fd, std::map<int , Client> &clients);
+bool check_user(int fd, std::map<int , Client> &clients, std::map<std::string , Chanel> &chanels);
 #endif 
 //rules << "Nickname rules:\n";
 //rules << "1. Must be between 1 and 9 characters long.\n";

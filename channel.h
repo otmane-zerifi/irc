@@ -55,6 +55,7 @@ class Chanel
 	public :
 		Chanel(int admin, std::string chanel_name , std::string topic);
 		~Chanel();
+		std::string getchanelname();
 		// void	invite_user(std::map<int, Client> &server_users, int client_fd_ask ,int user_to_invite);
 		int		Check_UserOnChanel(int fd_user);
 		void	Add_User(int fd_new_user, Client &client, std::string &pass ,std::map<int, Client> &server_users);

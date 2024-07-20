@@ -2,6 +2,11 @@
 #include "client.hpp"
 #include "string.h"
 
+std::string Chanel::getchanelname()
+{
+	return(chanel_global_name);
+}
+
 Chanel::Chanel(int admin, std::string chanel_name , std::string topic)
 {
     this->admin_fd = admin;

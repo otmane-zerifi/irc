@@ -1,5 +1,6 @@
 #include "server.h"
 #include "client.hpp"
+#include "channel.h"
 
 bool isValidChar(char c) {
     return std::isalnum(static_cast<unsigned char>(c)) || 
@@ -32,7 +33,7 @@ bool isValiduser(const std::string& user) {
     return true;
 }
 
-bool double_user(int fd, std::map<int, Client> &clients) {
+bool double_user(int fd, std::map<int, Client> &clients, std::map<std::string , Chanel> &chanels) {
 
         std::string username = clients[fd].buff;
         if(!isValiduser(username))
@@ -43,7 +44,15 @@ bool double_user(int fd, std::map<int, Client> &clients) {
         for (std::map<int, Client>::iterator jt = clients.begin(); jt != clients.end(); ++jt) {
             if (username == jt->second.username) {
                 send(fd, "EXIST USER\n" , 12 , 0);
-                return false; 
+                return false;
+            }
+        }
+        for(std::map<std::string , Chanel>::iterator it = chanels.begin(); it != chanels.end(); ++it)
+        {
+            if(username == it->first)
+            {
+                send(fd, "IS A CHANEL NAME\n", 18, 0);
+            return (false);
             }
         }
         std::cerr << "user not found\n";
@@ -261,7 +270,7 @@ bool isValidnick(int fd, std::string nickname)
     }
     return true;
 }
-bool check_user(int fd, std::map<int , Client> &clients)
+bool check_user(int fd, std::map<int , Client> &clients, std::map<std::string, Chanel> &chanels)
 {
     std::string username = clients[fd].arg[1];
         if(!isValiduser(username))
@@ -274,6 +283,12 @@ bool check_user(int fd, std::map<int , Client> &clients)
                 send(fd, "EXIST USER\n" , 12 , 0);
                 return false; 
             }
+        for(std::map<std::string , Chanel>::iterator it = chanels.begin(); it != chanels.end(); ++it)
+        {
+            if(username == it->first)
+                send(fd, "IS A CHANEL NAME\n", 18, 0);
+            return (false);
+        }
         }
     return true; // No duplicate usernames found
 }
@@ -289,7 +304,7 @@ void parss_data(int fd, std::map<int,Client> &client, std::string password, std:
         client[fd].auth = true;
         send(fd, "\033[1;32mWELCOM TO IRC SERVER\nENTER YOUR USERNAME:", 49, 0);
     }
-    else if(client[fd].auth && client[fd].username.empty() && *buffer != 0 && double_user(fd, client))
+    else if(client[fd].auth && client[fd].username.empty() && *buffer != 0 && double_user(fd, client, chanels))
     {
         client[fd].username = client[fd].buff;
         send(fd, "\033[1;32mENTER YOUR NIKENAME:", 28 , 0);
@@ -333,7 +348,7 @@ void parss_data(int fd, std::map<int,Client> &client, std::string password, std:
                 send(fd, "TO MANY ARGUMENT\n", 18,0);
             else if(nb < 2)
                 send(fd, "NOT ENOUGH ARGUMENT\n", 21, 0);
-            else if(check_user(fd, client))
+            else if(check_user(fd, client, chanels))
                 client[fd].username = client[fd].arg[1];
         }
         else if(cmd == "NICK" && check)
