@@ -17,7 +17,7 @@ Chanel::Chanel(int admin, std::string chanel_name , std::string topic)
 	// max user to -1
 	this->permision_info.max_user = -1;
 }
-
+//cj
 Chanel::~Chanel(){}
 
 void	Chanel::Broadcast_message(std::string msg, std::map<int, Client> &server_users)
