@@ -67,7 +67,7 @@ class Chanel
 		// void	set_restrictive_topic(bool status);
 		void	set_max_user(int fd_user, double max, std::map<int, Client> &server_users);
 		void	set_op_privileges(int fd_user, std::string &user_to_rank, int status, std::map<int, Client> &server_users);
-		void	Broadcast_message(std::string msg, std::map<int, Client> &server_users);
+		void	Broadcast_message(std::string msg, std::map<int, Client> &server_users, int fd);
 		void	set_admin(int new_admin);
 };
 

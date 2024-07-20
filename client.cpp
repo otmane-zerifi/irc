@@ -187,9 +187,9 @@ bool check_cmd(int fd, std::map<int , Client> &client)
 {
     if(client[fd].arg.empty())
         return(false);
-    std::string cmds[8] = {"SEND", "JOIN", "KICK", "INVITE", "TOPIC", "MODE", "USER", "NICK"};
+    std::string cmds[9] = {"SEND", "JOIN", "KICK", "INVITE", "TOPIC", "MODE", "USER", "NICK", "/help"};
     bool check =true;
-    for(int i =0; i < 8; i++)
+    for(int i =0; i < 9; i++)
     {
     if(client[fd].arg[0] == "MODE")
         return (check_mode(client, fd));
@@ -205,7 +205,7 @@ bool check_cmd(int fd, std::map<int , Client> &client)
     {
     if(client[fd].arg.size() > 3 && client[fd].arg[0] != "SEND" && client[fd].arg[0] != "MODE")
        return(send(fd, "TO MANY ARGUMENT\n" , 18, 0), false);
-    else if(client[fd].arg.size() < 3 && client[fd].arg[0] != "USER" && client[fd].arg[0] != "NICK")
+    else if(client[fd].arg.size() < 3 && client[fd].arg[0] != "USER" && client[fd].arg[0] != "NICK" && client[fd].arg[0] != "/help")
         return(send(fd, "NOT ENOUGH ARGUMENT\n", 21, 0), false);
     check = false;
     break;
@@ -249,7 +249,6 @@ void send_command_table(int client_fd, std::string user) {
     oss << BRIGHT_BLUE << "MODE +l        " << RESET << "| Set user limit to channel             " << RESET << " | mode +l #channel <number of user>\n";
     oss << BRIGHT_BLUE << "MODE -l        " << RESET << "| Remove user limit to channel          " << RESET << " | mode -l #channel\n";
     oss << BRIGHT_GREEN << "SEND           " << RESET << "| Send message to other client          " << RESET << " | username/channel : your message\n";
-    oss << getTimestamp() << " @" << user << " :";
     std::string message = oss.str();
     send(client_fd, message.c_str(), message.size(), 0);
 }
@@ -269,7 +268,7 @@ void parss_data(int fd, std::map<int,Client> &client, std::string password, std:
     char *buffer = client[fd].buffer;
     std::string buff = client[fd].buff;
     if(!client[fd].auth && buff != password)
-        send(fd, "\033[31m INCORRECT PASSWORD\n", 26, 0);
+        send(fd, "\033[31mINCORRECT PASSWORD\033[0m\nENTRE PASSWORD : ", 46, 0);
     else if(!client[fd].auth && buff == password)
     {
         client[fd].auth = true;
@@ -283,7 +282,7 @@ void parss_data(int fd, std::map<int,Client> &client, std::string password, std:
     else if(client[fd].auth && client[fd].nickname.empty() && *buffer != 0 && !client[fd].username.empty() && isValidnick(fd, buff))
     {
         client[fd].nickname = client[fd].buff;
-        send_command_table(fd, client[fd].username);
+        send(fd, "Welcom, for manual enter /help\n", 31 , 0);
     }
     else if(!client[fd].username.empty() && !client[fd].nickname.empty())
     {
@@ -300,8 +299,8 @@ void parss_data(int fd, std::map<int,Client> &client, std::string password, std:
             {
                 if(chanels.find(client[fd].arg[1])->second.Check_UserOnChanel(fd))
                 {
-                    std::string msg = "-->\nmessage from @" + client[fd].username + " in channel #" + client[fd].arg[1] + " :" + client[fd].arg[3] + "\n";
-                    chanels.find(client[fd].arg[1])->second.Broadcast_message(msg, client);
+                    std::string msg = "-->\nmessage from @" + client[fd].username + " in channel #" + client[fd].arg[1] + " : " + client[fd].arg[3] + "\n";
+                    chanels.find(client[fd].arg[1])->second.Broadcast_message(msg, client, fd);
                 }
                 else
                     send(fd, "YOU ARE NOT IN THIS CHANNEL , JOIN IT\n", 39, 0);
@@ -310,6 +309,8 @@ void parss_data(int fd, std::map<int,Client> &client, std::string password, std:
                 send(fd, "INVALIDE ADDRESSEE\n", 20, 0);
             // problem ui on send on client ui 
         }
+        else if(cmd == "/help")
+            send_command_table(fd, client[fd].username);
         else if(cmd == "USER")
         {
             int nb = client[fd].arg.size();
@@ -392,7 +393,6 @@ void parss_data(int fd, std::map<int,Client> &client, std::string password, std:
             }
         }
         std::string str= getTimestamp() + " @" + client[fd].username + " :";
-        const char *mes = str.c_str();
-        send(fd, mes, strlen(mes), 0);
+        send(fd, str.c_str(), str.length(), 0);
     }
 }

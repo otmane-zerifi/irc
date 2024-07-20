@@ -71,7 +71,7 @@ void    Server::Handle_Close_Connection(int i)
 	if (epoll_ctl(epoll_fd, EPOLL_CTL_DEL, Events[i].data.fd, NULL) == -1)
 			return ((void)(std::cerr << RED << "ERROR : EPOOL CTL CLIENT DEL" << RESET << std::endl));
 	close(Events[i].data.fd);
-	std::cout << BLUE << "ERROR : Connection of Client closed" <<  RESET << std::endl;
+	std::cerr << "closed connection\n";
 }
 
 void    Server::Handle_Client_Data(int i, std::map<int, Client> &client, std::map<std::string, Chanel> &chanels)
@@ -79,7 +79,6 @@ void    Server::Handle_Client_Data(int i, std::map<int, Client> &client, std::ma
 	int fd = Events[i].data.fd;
 	if (Events[i].events & EPOLLIN)
 	{
-		std::cout <<"------------- " << std::endl;
 		memset(client[fd].buffer, 0, sizeof(client[fd].buffer));
 		int nb_byte = read(Events[i].data.fd, client[fd].buffer, 1024);
 		if (nb_byte < 0)
@@ -95,7 +94,6 @@ void    Server::Handle_Client_Data(int i, std::map<int, Client> &client, std::ma
 			std::string data(client[fd].buffer);
 			client[fd].buff += data;
 			size_t n =  client[fd].buff.find('\n');
-			std::cerr << "n = " << n << std::endl;
 			if(!client[fd].buff.empty() && n != std::string::npos)
 			{
 			client[fd].buff = client[fd].buff.substr(0, n);
@@ -104,7 +102,6 @@ void    Server::Handle_Client_Data(int i, std::map<int, Client> &client, std::ma
 			}
 		}
 	}
-			// std::cout << client[fd].buffer ;
 }
 
 int	Server::Multiplexing()
@@ -126,7 +123,7 @@ int	Server::Multiplexing()
 			return (std::cerr << RED << "ERROR : EPOOL WAIT" <<  RESET << std::endl, 0);
 		if (num_event == (int)(Events.size()))
 			Events.resize(Events.size() * 2);
-		for (int i = 0; i < num_event; i ++)
+		for (int i = 0; i < num_event; i++)
 		{
 			if (Events[i].data.fd == Server_Socket)
 			{
