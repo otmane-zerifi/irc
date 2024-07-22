@@ -58,6 +58,7 @@ int    Server::Handle_New_Connection()
 {
 	if ((Client_Socket = accept(Server_Socket, (struct sockaddr *)&Client_addr, &Client_addrlen)) == -1)
 			return ((std::cerr << RED <<"ERROR : Accept Connection " <<RESET <<std::endl), -1);
+	fcntl(Client_Socket, F_SETFL, O_NONBLOCK);
 	Client_event.data.fd = Client_Socket;
 	Client_event.events = EPOLLIN | EPOLLOUT;
 	if (epoll_ctl(epoll_fd, EPOLL_CTL_ADD, Client_Socket, &Client_event) == -1)
@@ -74,7 +75,7 @@ void    Server::Handle_Close_Connection(int i)
 	std::cerr << "closed connection\n";
 }
 
-void    Server::Handle_Client_Data(int i, std::map<int, Client> &client, std::map<std::string, Chanel> &chanels)
+void    Server::Handle_Client_Data(int i, std::map<int, Client>& client, std::map<std::string, Chanel>& chanels)
 {
 	int fd = Events[i].data.fd;
 	if (Events[i].events & EPOLLIN)

@@ -1,6 +1,7 @@
 #ifndef CLIENT_HPP
 #define CLIENT_HPP
-#include "channel.h"
+#include "chanel.h"
+#include "server.h"
 #include <iostream>
 #include <ctime>
 #include <sstream>
@@ -20,16 +21,30 @@ class Client {
 };
 
 bool isValidnick(int fd, std::string nickname);
+bool check_cmd(int fd, std::map<int , Client> &client);
+void send_command_table(int client_fd, std::string user);
+std::string trim(const std::string &str);
+bool double_user(int fd, std::map<int, Client> &clients, std::map<std::string , Chanel> &chanels);
 std::string getTimestamp();
 bool isValidChar(char c);
 bool isValiduser(const std::string& user);
-void parss_data(int fd, std::map<int, Client> &client, std::string pass , std::map<std::string, Chanel> &chanels);
+void send_command(int fd, std::map<int,Client>& client, std::map<std::string, Chanel>& chanels);
 int fd_ofuser(std::string username, std::map<int, Client> client);
 void send_message(int fd, std::map<int , Client> client);
+void user_command(int fd,std::map<int,Client>& client, std::map<std::string, Chanel>& chanels);
+void nick_command(int fd, std::map<int,Client>& client);
+void handle_command(int fd, std::map<int,Client>& client, std::map<std::string, Chanel>& chanels);
+void option_mode(int fd, std::map<int,Client>& client, std::map<std::string, Chanel>& chanels);
+void join_command(int fd, std::map<int,Client>& client, std::map<std::string, Chanel>& chanels);
 std::string get_user(const std::string& cmd);
+void mode_command(int fd, std::map<int,Client>& client, std::map<std::string, Chanel>& chanels);
 void trim(std::string& str);
+void authentication(int fd, std::map<int , Client> &client, std::string& password);
+void set_username(int fd, std::map<int,Client>& client, std::map<std::string, Chanel>& chanels);
+void set_nickname(int fd,  std::map<int,Client>& client);
 std::vector<std::string> splitString(const std::string& str);
-bool check_user(int fd, std::map<int , Client> &clients, std::map<std::string , Chanel> &chanels);
+void parss_data(int fd, std::map<int, Client>& client,  std::string& password, std::map<std::string, Chanel>& chanels);
+bool check_user(int fd, std::map<int , Client> &clients, std::map<std::string , Chanel>& chanels);
 #endif 
 //rules << "Nickname rules:\n";
 //rules << "1. Must be between 1 and 9 characters long.\n";
