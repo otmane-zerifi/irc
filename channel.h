@@ -1,6 +1,6 @@
 
-#ifndef CHANEL_HPP
-#define CHANEL_HPP
+#ifndef CHANNEL_HPP
+#define CHANNEL_HPP
 
 #include <iostream>
 #include <sys/socket.h>

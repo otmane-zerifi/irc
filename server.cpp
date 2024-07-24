@@ -63,7 +63,8 @@ int    Server::Handle_New_Connection()
 	Client_event.events = EPOLLIN | EPOLLOUT;
 	if (epoll_ctl(epoll_fd, EPOLL_CTL_ADD, Client_Socket, &Client_event) == -1)
 		return ((std::cerr << RED << "ERROR : EPOOL CTL ADD CLIENT" << RESET << std::endl) , -1);
-	send(Client_Socket, "\033[37mENTER PASSWORD TO ACCESS THE SERVER\n: ", 44, 0);
+	std::string message = WHITE "ENTER PASSWORD : " RESET ;
+	send(Client_Socket, message.c_str() , message.length(), 0);
 	return Client_Socket;
 }
 

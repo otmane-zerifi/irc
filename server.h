@@ -15,7 +15,7 @@
 #include <cerrno>
 #include "client.hpp"
 #include <cstdlib>
-#include "chanel.h"
+#include "channel.h"
 #include <fcntl.h>
 
 

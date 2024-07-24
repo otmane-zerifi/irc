@@ -1,4 +1,4 @@
-# include "chanel.h"
+# include "channel.h"
 # include "client.hpp"
 
 void	Chanel::set_new_topic(int fd_user, std::string &topic, std::map<int, Client> &server_users)

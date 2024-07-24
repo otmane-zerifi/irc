@@ -1,4 +1,4 @@
-# include "chanel.h"
+# include "channel.h"
 # include "client.hpp"
 
 void	Invite_manager(int fd_user, std::string &to_invite, std::string chanel_name, std::map<int, \
@@ -12,7 +12,7 @@ void	Invite_manager(int fd_user, std::string &to_invite, std::string chanel_name
 			chanels.find(chanel_name)->second.invite_user(fd_user,to_invite, server_users);
 		else
 		{
-			msg = RED "Chanel not found \n"  RESET;
+			msg = RED "Channel not found \n"  RESET;
 			return ((void)(send(fd_user, msg.c_str(), msg.length(), 0)));
 		}
 	}
@@ -34,7 +34,7 @@ void	Chanel::invite_user(int fd_user, std::string &to_invite, std::map<int, Clie
 		{
 			if (std::find(list_user_invited.begin(), list_user_invited.end(), to_invite) == list_user_invited.end())
 			{
-				std::string msg = (GREEN "\nYou invited to chanel ") + this->chanel_global_name + " TO join (JOIN " \
+				std::string msg = (GREEN "\nYou invited to channel ") + this->chanel_global_name + " TO join (JOIN " \
 				+ chanel_global_name + ")" + RESET + "\n" + getTimestamp() + " @" + server_users[fd_user].username + " :";
 				send(fd_to_invite, msg.c_str(), msg.length(), 0);
 				list_user_invited.push_back(to_invite);
@@ -44,19 +44,19 @@ void	Chanel::invite_user(int fd_user, std::string &to_invite, std::map<int, Clie
 				std::vector<std::string>::iterator it = std::find(list_user_invited.begin(), list_user_invited.end(), to_invite);
 				if ( it == list_user_invited.end())
 					list_user_invited.push_back(to_invite);
-				msg = RED "User " + to_invite  + " on queue of Invitation list\n" RESET;
+				msg = WHITE "User " + to_invite  + " on queue of Invitation list\n" RESET;
 				send(fd_user, msg.c_str(), msg.length(), 0);
 			}
 		}
 		else
 		{
-			msg = RED  "User Already on Chanel\n" RESET;
+			msg = RED  "User Already on Channel\n" RESET;
 			send(fd_user, msg.c_str(), msg.length(), 0);
 		}
 	}
 	else
 	{
-		msg = RED  "PERMISSION DENIED : You are not on chanel \n"  RESET;
+		msg = RED  "PERMISSION DENIED : You are not on channel \n"  RESET;
 		send(fd_user, msg.c_str(), msg.length(), 0);
 	}
 }

@@ -5,9 +5,9 @@ void user_command(int fd,std::map<int,Client>& client, std::map<std::string, Cha
 {
     int nb = client[fd].arg.size();
     if(nb > 2)
-        send(fd, "TO MANY ARGUMENT\n", 18,0);
+        send_error_message(fd, "TO MANY ARGUMENT\n");
     else if(nb < 2)
-        send(fd, "NOT ENOUGH ARGUMENT\n", 21, 0);
+        send_error_message(fd, "NOT ENOUGH ARGUMENT\n");
     else if(check_user(fd, client, chanels))
         client[fd].username = client[fd].arg[1];
 }
@@ -16,9 +16,9 @@ void nick_command(int fd, std::map<int,Client>& client)
 {
     int nb = client[fd].arg.size();
     if(nb > 2)
-        send(fd, "TO MANY ARGUMENT\n", 18,0);
+        send_error_message(fd, "TO MANY ARGUMENT\n");
     else if(nb < 2)
-        send(fd, "NOT ENOUGH ARGUMENT\n", 21, 0);
+        send_error_message(fd, "NOT ENOUGH ARGUMENT\n");
     else if(isValidnick(fd, client[fd].arg[1]))
         client[fd].nickname = client[fd].arg[1];
 }

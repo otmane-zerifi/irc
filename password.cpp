@@ -1,5 +1,5 @@
 # include "client.hpp"
-# include "chanel.h"
+# include "channel.h"
 
 void	Password_manager(int fd_user, std::string &new_pass ,bool status, std::string &chanel_name , \
 		std::map<int, Client> &server_users, std::map<std::string , Chanel> &chanels)

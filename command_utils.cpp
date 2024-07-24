@@ -60,7 +60,11 @@ std::vector<std::string> splitString(const std::string& str) {
 
     return result;
 }
-
+void send_error_message(int fd, std::string message)
+{
+    std::string color = RED + message  + RESET;
+    send(fd, color.c_str(),color.length() , 0);
+}
 bool check_mode(std::map<int, Client> client, int fd)
 {
     std::string option[10] = {"+i" , "-i", "+l", "-l",\
@@ -70,62 +74,62 @@ bool check_mode(std::map<int, Client> client, int fd)
     || client[fd].arg[1] == "+l" || client[fd].arg[1] == "+k" ))
     {
     if(size > 4 || size < 4)
-       return(send(fd, "error in setings of command\n", 29, 0), false);
+        return(send_error_message(fd, "error in setings of command\n"), false);
     if(client[fd].arg[1] == "+l")
     {
         std::string str = client[fd].arg[3];
         for (std::string::const_iterator it = str.begin(); it != str.end(); ++it) {
         if (!isdigit(*it)) {
-            return(send(fd, "SHOULD ENTER DIGITS\n", 21,0) , false); // If any character is not a digit, return false
+            return(send_error_message(fd, "SHOULD ENTER DIGITS\n") , false); // If any character is not a digit, return false
         }
         }
     long int num = std::atol(str.c_str());
     if(num > INT32_MAX)
-        return(send(fd, "long number\n", 13, 0), false);
+        return(send_error_message(fd, "long number\n"), false);
     }
     return(true);
     }
     if(client[fd].arg.size() > 3)
-        return(send(fd, "TO MANY ARGUMENT\n", 18, 0), false);
+        return(send_error_message(fd, "TO MANY ARGUMENT\n"), false);
     if(client[fd].arg.size() < 3)
-        return(send(fd, "NOT ENOUGH ARGUMENT\n", 21, 0) , false);
+        return(send_error_message(fd, "NOT ENOUGH ARGUMENT\n") , false);
     for(int i = 0; i < 11; i++)
     {
         if(option[i] == client[fd].arg[1])
                 return(true);
     }
-    return (send(fd, "OPTION NOT FOUND\n",18, 0) ,false);
+    return (send_error_message(fd, "OPTION NOT FOUND\n") ,false);
 }
 
 bool check_cmd(int fd, std::map<int , Client> &client)
 {
     if(client[fd].arg.empty())
         return(false);
-    std::string cmds[9] = {"SEND", "JOIN", "KICK", "INVITE", "TOPIC", "MODE", "USER", "NICK", "/help"};
+    std::string cmds[9] = {"/send", "/join", "/kick", "/invite", "/topic", "/mode", "/user", "/nick", "/help"};
     bool check =true;
     for(int i =0; i < 9; i++)
     {
-    if(client[fd].arg[0] == "MODE")
+    if(client[fd].arg[0] == "/mode")
         return (check_mode(client, fd));
-    if(client[fd].arg[0] == "JOIN")
+    if(client[fd].arg[0] == "/join")
     {
         if(client[fd].arg.size() > 3)
-            return(send(fd, "TO MANY ARGUMENT\n" , 18, 0), false);
+            return(send_error_message(fd, "TO MANY ARGUMENT\n"), false);
         else if(client[fd].arg.size() < 2)
-            return(send(fd, "NOT ENOUGH ARGUMENT\n", 21, 0), false);
+            return(send_error_message(fd, "NOT ENOUGH ARGUMENT\n"), false);
         return (true);
     }
     else if(cmds[i] == client[fd].arg[0])
     {
-    if(client[fd].arg.size() > 3 && client[fd].arg[0] != "SEND" && client[fd].arg[0] != "MODE")
-       return(send(fd, "TO MANY ARGUMENT\n" , 18, 0), false);
-    else if(client[fd].arg.size() < 3 && client[fd].arg[0] != "USER" && client[fd].arg[0] != "NICK" && client[fd].arg[0] != "/help")
-        return(send(fd, "NOT ENOUGH ARGUMENT\n", 21, 0), false);
+    if(client[fd].arg.size() > 3  && client[fd].arg[0] != "/mode")
+       return(send_error_message(fd, "TO MANY ARGUMENT\n"), false);
+    else if(client[fd].arg.size() < 3 && client[fd].arg[0] != "/user" && client[fd].arg[0] != "/nick" && client[fd].arg[0] != "/help")
+        return(send_error_message(fd, "NOT ENOUGH ARGUMENT\n"), false);
     check = false;
     break;
     }
     }
     if(check)
-        return(send(fd, "COMMAND NOT FOUND\n", 19, 0), false);
+        return(send_error_message(fd, "COMMAND NOT FOUND\n"), false);
     return true;
 }

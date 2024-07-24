@@ -1,4 +1,4 @@
-#include "chanel.h"
+#include "channel.h"
 #include "client.hpp"
 
 bool	Chanel::permission_check(int username_fd, std::map<int, Client> &server_users)
@@ -20,7 +20,7 @@ bool	Chanel::check_list_invitation(int fd_new_user, std::map<int, Client> &serve
 		list_user_invited.end(), convert_fd_to_name(fd_new_user, server_users));
 	if (check == list_user_invited.end())
 	{
-		std::string msg = RED "To Join Chanel You need invitation\n" RESET;
+		std::string msg = RED "To Join Channel You need invitation\n" RESET;
 		return((void)(send(fd_new_user, msg.c_str(), msg.length(), 0)), false);
 	}
 	return true;
@@ -32,7 +32,7 @@ bool	Chanel::check_password(int fd_new_user, std::string pass, std::map<int, Cli
 	if (pass != password_info.password)
 	{
 		if (pass == "")
-			msg = RED "Password to join chanel is requiered\n" RESET;
+			msg = RED "Password to join channel is requiered\n" RESET;
 		else
 			msg = RED "Wrong Password\n" RESET;
 		return((void)(send(fd_new_user, msg.c_str(), msg.length(), 0)), false);

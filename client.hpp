@@ -1,6 +1,6 @@
 #ifndef CLIENT_HPP
 #define CLIENT_HPP
-#include "chanel.h"
+#include "channel.h"
 #include "server.h"
 #include <iostream>
 #include <ctime>
@@ -19,7 +19,7 @@ class Client {
     std::string username;
     std::string nickname;
 };
-
+void send_error_message(int fd, std::string message);
 bool isValidnick(int fd, std::string nickname);
 bool check_cmd(int fd, std::map<int , Client> &client);
 void send_command_table(int client_fd, std::string user);

@@ -1,4 +1,4 @@
-# include "chanel.h"
+# include "channel.h"
 # include "client.hpp"
 
 void	priviliges_manager(int fd_user, std::string &user_to_rank, int status, std::string &chanel_name , \
@@ -10,7 +10,7 @@ void	priviliges_manager(int fd_user, std::string &user_to_rank, int status, std:
 		chanels.find(chanel_name)->second.set_op_privileges(fd_user, user_to_rank, status, server_users);
 	else
 	{
-		msg = RED "Chanel not Found\n" RESET;
+		msg = RED "Channel not Found\n" RESET;
 		return ((void)(send(fd_user, msg.c_str(), msg.length(), 0)));
 	}
 }
@@ -28,7 +28,7 @@ void	Chanel::set_op_privileges(int fd_user, std::string &user_to_rank, int statu
 		}
 		else
 		{
-			msg = RED "You are Not on Chanel\n" RESET;
+			msg = RED "You are Not on Channel\n" RESET;
 			return ((void)(send(fd_user, msg.c_str(), msg.length(), 0)));
 		}
 	}

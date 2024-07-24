@@ -1,4 +1,4 @@
-# include "chanel.h"
+# include "channel.h"
 # include "client.hpp"
 
 void	join_user(std::string &chanel_name, std::map<std::string , Chanel> &chanels, int fd_new_user, \
@@ -13,13 +13,13 @@ void	join_user(std::string &chanel_name, std::map<std::string , Chanel> &chanels
 				pass, server_users);
 			else
 			{
-				std::string msg(RED "YOU already on Chanel\n" RESET);
+				std::string msg(RED "YOU already on Channel\n" RESET);
 				send(fd_new_user, msg.c_str(), msg.length(), 0);
 			}
 		}
 		else
 		{
-			std::string msg = std::string(GREEN"You just Create a new Chanel (") + chanel_name.c_str() + ") and now you're the admin\n" RESET;
+			std::string msg = std::string(GREEN"You just Create a new Channel (") + chanel_name.c_str() + ") and now you're the admin\n" RESET;
 			send(fd_new_user, msg.c_str(), msg.length(), 0);
 			Chanel new_chanel(fd_new_user, chanel_name, std::string("topic name"));
 			chanels.insert(std::pair<std::string, Chanel>(chanel_name, new_chanel));
@@ -40,11 +40,11 @@ void	Chanel::Add_User(int fd_new_user, Client &client, std::string &pass, \
 		return ;
 	if (this->permision_info.max_user >= 0 && this->permision_info.max_user <= users.size())
 	{
-		std::string msg = RED "Chanel reach max number of users\n" RESET;
+		std::string msg = RED "Channel reach max number of users\n" RESET;
 		return((void)(send(fd_new_user, msg.c_str(), msg.length(), 0)));
 	}
 	users.insert(std::pair<int, Client>(fd_new_user, client));
-	std::string msg = std::string(GREEN"You have been join to Chanel (") + \
+	std::string msg = std::string(GREEN"You have been join to Channel (") + \
 	chanel_global_name + ")\n" RESET;
 	send(fd_new_user, msg.c_str(), msg.length(), 0);
 }

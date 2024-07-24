@@ -1,15 +1,9 @@
 #include "client.hpp"
 #include "server.h"
 
-std::string get_message(std::string str)
+std::string get_message(std::vector<std::string> &str)
 {
-    std::string::size_type pos = str.find(':'); // Find the position of ':'
-    if (pos != std::string::npos && str.length() > pos + 1) {
-        return trim(str.substr(pos + 1)) + "\n";
-              // Return substring after ':'
-    } else {
-        return ""; // Return empty string if ':' is not found
-    }
+    return(str[2] + "\n");
 }
 
 int fd_ofuser(std::string username, std::map<int, Client> client) {
@@ -24,18 +18,18 @@ int fd_ofuser(std::string username, std::map<int, Client> client) {
 
 void send_message(int fd, std::map<int , Client> client)
 {
-    if(client[fd].arg.size() > 4 || client[fd].arg.size() < 4)
+    if(client[fd].arg.size() > 3 || client[fd].arg.size() < 3)
     {
-        send(fd, "INCOMPLET ARGUMENT\n", 20, 0);
+        send_error_message(fd, "INCOMPLET ARGUMENT\n");
         return ;
     }
    int fd_user =  fd_ofuser(client[fd].arg[1], client);
    if(fd_user < 0)
-        return((void)send(fd, "USER NOT FOUND\n", 16, 0));
-   std::string message = "message from @" + client[fd].username  + " :" + get_message(client[fd].buffer);
-   std::string new_messag = (fd_user == fd) ?  message : "\n" + message + getTimestamp() + " @" + client[fd_user].username + " :";
+        return((void)send_error_message(fd, "USER NOT FOUND\n"));
+   std::string message = GREEN "message from @" + client[fd].username  + " :" + get_message(client[fd].arg);
+   std::string new_messag = (fd_user == fd) ?  message : "\n" + message + PURPLE + getTimestamp() + " @" + client[fd_user].username + " :";
    if(new_messag.empty())
-        return((void)send(fd, "NO MESSAGE\n", 12, 0));
+        return((void)send_error_message(fd, "NO MESSAGE\n"));
    else
         send(fd_user, new_messag.c_str(), new_messag.length(), 0);
 }
@@ -44,16 +38,16 @@ void send_command(int fd, std::map<int,Client>& client, std::map<std::string, Ch
 {
     if(fd_ofuser(client[fd].arg[1], client) >= 0)
         send_message(fd, client);
-        else if (Check_Existng_Chanel(client[fd].arg[1], chanels))
+    else if (Check_Existng_Chanel(client[fd].arg[1], chanels))
         {
             if(chanels.find(client[fd].arg[1])->second.Check_UserOnChanel(fd))
             {
-                std::string msg = "-->\nmessage from @" + client[fd].username + " in channel #" + client[fd].arg[1] + " : " + client[fd].arg[3] + "\n";
+                std::string msg = GREEN "-->\nmessage from @" + client[fd].username + " in channel #" + client[fd].arg[1] + " : " + client[fd].arg[2] + "\n" RESET;
                 chanels.find(client[fd].arg[1])->second.Broadcast_message(msg, client, fd);
             }
             else
-                send(fd, "YOU ARE NOT IN THIS CHANNEL , JOIN IT\n", 39, 0);
+                send_error_message(fd, "YOU ARE NOT IN THIS CHANNEL , JOIN IT\n");
         }
          else 
-            send(fd, "INVALIDE ADDRESSEE\n", 20, 0);
+            send_error_message(fd, "INVALIDE ADDRESSEE\n");
 }
