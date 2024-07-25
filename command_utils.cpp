@@ -100,15 +100,40 @@ bool check_mode(std::map<int, Client> client, int fd)
     }
     return (send_error_message(fd, "OPTION NOT FOUND\n") ,false);
 }
-
+bool check_dcc(int fd, std::map<int , Client> &client)
+{
+    int size = client[fd].arg.size();
+    if(size > 4)
+        return(send_error_message(fd, "TO MANY ARGUMENT\n") , false);
+    else if (size < 4)
+        return(send_error_message(fd, "NOT ENOUGH ARGUMENT\n"), false);
+    else if(client[fd].arg[1] != "send")
+        return(send_error_message(fd, "INVALIDE ARGUMENT , USAGE /dcc send [user] [file path]\n"), false);
+    int fd_recev  = fd_ofuser(client[fd].arg[2], client);
+    if(fd_recev >= 0)
+    {
+        client[fd_recev].authfile = true;
+        client[fd_recev].filepath = client[fd].arg[3];
+        notification_user(fd_recev, " \nuser @" + client[fd].username +  " want to send you a file do you want receive it yes/no:");
+    }
+    if(fd_recev < 0)
+        return(send_error_message(fd, "User not found\n"), false);
+    return true;
+}
 bool check_cmd(int fd, std::map<int , Client> &client)
 {
     if(client[fd].arg.empty())
         return(false);
-    std::string cmds[9] = {"/send", "/join", "/kick", "/invite", "/topic", "/mode", "/user", "/nick", "/help"};
-    bool check =true;
-    for(int i =0; i < 9; i++)
+    if(client[fd].arg.size() == 1 && client[fd].authfile && \
+    (client[fd].arg[0] == "yes" || client[fd].arg[0] == "no"))
+        return true;
+    std::string cmds[11] = {"/send", "/join", "/kick", "/invite", "/topic", "/mode",  \
+    "/user", "/nick", "/help", "/dcc", "/privmsg"};
+    bool check = true;
+    for(int i = 0; i < 11; i++)
     {
+    if(client[fd].arg[0] == "/dcc")
+        return(check_dcc(fd, client));
     if(client[fd].arg[0] == "/mode")
         return (check_mode(client, fd));
     if(client[fd].arg[0] == "/join")

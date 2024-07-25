@@ -35,7 +35,7 @@ void	Chanel::invite_user(int fd_user, std::string &to_invite, std::map<int, Clie
 			if (std::find(list_user_invited.begin(), list_user_invited.end(), to_invite) == list_user_invited.end())
 			{
 				std::string msg = (GREEN "\nYou invited to channel ") + this->chanel_global_name + " TO join (JOIN " \
-				+ chanel_global_name + ")" + RESET + "\n" + getTimestamp() + " @" + server_users[fd_user].username + " :";
+				+ chanel_global_name + ")" + BLUE + "\n" + getTimestamp() + " @" + server_users[convert_name_to_fd(to_invite, server_users)].username + " :" RESET;
 				send(fd_to_invite, msg.c_str(), msg.length(), 0);
 				list_user_invited.push_back(to_invite);
 			}

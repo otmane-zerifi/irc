@@ -25,7 +25,8 @@ void send_command_table(int client_fd, std::string user) {
     oss << GREEN << "/mode -o       " << RESET << "| Take channel operator privilege       " << RESET << " | /mode -o <username> #channel\n";
     oss << BRIGHT_BLUE << "/mode +l       " << RESET << "| Set user limit to channel             " << RESET << " | /mode +l #channel <number of user>\n";
     oss << BRIGHT_BLUE << "/mode -l       " << RESET << "| Remove user limit to channel          " << RESET << " | /mode -l #channel\n";
-    oss << BRIGHT_GREEN << "/send          " << RESET << "| Send message to other client          " << RESET << " | /send username|channel  (your message)\n";
+    oss << BRIGHT_GREEN << "/send          " << RESET << "| Send message to the channel           " << RESET << " | /send [channel name] [message]\n";
+    oss << YELLOW       << "/privmsg       " << RESET << "| Send private message to other client  " << RESET << " | /privmsg [username] [message]\n";
     std::string message = oss.str();
     send(client_fd, message.c_str(), message.size(), 0);
 }
@@ -66,7 +67,7 @@ bool double_user(int fd, std::map<int, Client> &clients, std::map<std::string , 
         std::string username = clients[fd].buff;
         if(!isValiduser(username))
         {
-            send_error_message(fd, "INVALIDE USERNAME\n\033[35mENTER VALID USERNAME:");
+            send_error_message(fd, "INVALIDE USERNAME\n\033[34mENTER VALID USERNAME:");
             return false;
         }
         for (std::map<int, Client>::iterator jt = clients.begin(); jt != clients.end(); ++jt) {

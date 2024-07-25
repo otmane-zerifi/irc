@@ -14,11 +14,14 @@ class Client {
     int fd;
     char buffer[1024];
     bool auth;
+    bool authfile;
+    std::string filepath;
     std::vector<std::string> arg;
     std::string buff;
     std::string username;
     std::string nickname;
 };
+void notification_user(int fd, std::string message);
 void send_error_message(int fd, std::string message);
 bool isValidnick(int fd, std::string nickname);
 bool check_cmd(int fd, std::map<int , Client> &client);

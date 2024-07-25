@@ -48,7 +48,7 @@ void authentication(int fd, std::map<int , Client> &client, std::string& passwor
     else if(buff == password)
     {
         client[fd].auth = true;
-        notification_user(fd, "----------------->WELCOME TO IRC SERVER<-----------------\n\033[35mENTER YOUR USERNAME:");
+        notification_user(fd, "----------------->WELCOME TO IRC SERVER<-----------------\n\033[34mENTER YOUR USERNAME:");
     }
 }
 
@@ -58,7 +58,7 @@ void set_username(int fd, std::map<int,Client>& client, std::map<std::string, Ch
     if(!buffer.empty() && double_user(fd, client, chanels))
     {
         client[fd].username = client[fd].buff;
-        std::string message = PURPLE "ENTER YOUR NIKENAME:" RESET;
+        std::string message = BLUE "ENTER YOUR NIKENAME:" RESET;
         send(fd, message.c_str(), message.length() , 0);
     }
 }
@@ -69,7 +69,7 @@ void set_nickname(int fd,  std::map<int,Client>& client)
    if(!buffer.empty() && !client[fd].username.empty() && isValidnick(fd, buffer))
     {
         client[fd].nickname = client[fd].buff;
-        std::string message = GREEN "Welcome, for manual enter /help\n" PURPLE + getTimestamp() + " @" + client[fd].username + " :" RESET;
+        std::string message = GREEN "Welcome, for manual enter /help\n" BLUE + getTimestamp() + " @" + client[fd].username + " :" RESET;
         send(fd, message.c_str(), message.length() , 0);
     }
 }

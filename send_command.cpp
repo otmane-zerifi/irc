@@ -26,8 +26,8 @@ void send_message(int fd, std::map<int , Client> client)
    int fd_user =  fd_ofuser(client[fd].arg[1], client);
    if(fd_user < 0)
         return((void)send_error_message(fd, "USER NOT FOUND\n"));
-   std::string message = GREEN "message from @" + client[fd].username  + " :" + get_message(client[fd].arg);
-   std::string new_messag = (fd_user == fd) ?  message : "\n" + message + PURPLE + getTimestamp() + " @" + client[fd_user].username + " :";
+   std::string message = GREEN "message from @" + client[fd].username  + " :" + get_message(client[fd].arg) + RESET;
+   std::string new_messag = (fd_user == fd) ?  message : "\n" + message + BLUE + getTimestamp() + " @" + client[fd_user].username + " :" RESET;
    if(new_messag.empty())
         return((void)send_error_message(fd, "NO MESSAGE\n"));
    else
@@ -36,9 +36,8 @@ void send_message(int fd, std::map<int , Client> client)
 
 void send_command(int fd, std::map<int,Client>& client, std::map<std::string, Chanel>& chanels)
 {
-    if(fd_ofuser(client[fd].arg[1], client) >= 0)
-        send_message(fd, client);
-    else if (Check_Existng_Chanel(client[fd].arg[1], chanels))
+
+     if (Check_Existng_Chanel(client[fd].arg[1], chanels))
         {
             if(chanels.find(client[fd].arg[1])->second.Check_UserOnChanel(fd))
             {

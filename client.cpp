@@ -2,6 +2,15 @@
 #include "client.hpp"
 #include "channel.h"
 
+void send_file(int fd,  std::map<int,Client>& client)
+{
+    if(client[fd].authfile)
+        {}
+    else if(!client[fd].authfile)
+        send_error_message(fd, "COMMAND NOT FOUND\n");
+    client[fd].authfile = false;
+}
+
 void handle_command(int fd, std::map<int,Client>& client, std::map<std::string, Chanel>& chanels)
 {
     std::string cmd;
@@ -11,6 +20,10 @@ void handle_command(int fd, std::map<int,Client>& client, std::map<std::string, 
     bool check = check_cmd(fd, client);
     if (cmd == "/send" && check)
         send_command(fd, client, chanels);
+    else if (client[fd].authfile)
+        send_file(fd, client);
+    else if(cmd == "/privmsg" && check)
+        send_message(fd, client);
     else if(cmd == "/help")
         send_command_table(fd, client[fd].username);
     else if(cmd == "/user")
@@ -43,7 +56,7 @@ void parss_data(int fd, std::map<int,Client>& client, std::string& password, std
     else if(!client[fd].username.empty() && !client[fd].nickname.empty())
     {
         handle_command(fd, client, chanels);
-    std::string str = PURPLE  + getTimestamp() + " @" + client[fd].username + " :" RESET;
+    std::string str = BLUE  + getTimestamp() + " @" + client[fd].username + " :" RESET;
     send(fd, str.c_str(), str.length(), 0);
     }
 }

@@ -131,7 +131,10 @@ int	Server::Multiplexing()
 			{
 				int nm = Handle_New_Connection();
 				if(nm > 0)
+				{
 					client[nm].auth = false;
+					client[nm].authfile = false; 
+				}
 			}
 			else
 				Handle_Client_Data(i, client, chanels);
