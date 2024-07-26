@@ -60,6 +60,7 @@ std::vector<std::string> splitString(const std::string& str) {
 
     return result;
 }
+
 void send_error_message(int fd, std::string message)
 {
     std::string color = RED + message  + RESET;

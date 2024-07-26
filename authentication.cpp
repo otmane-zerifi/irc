@@ -16,7 +16,7 @@ bool check_user(int fd, std::map<int , Client> &clients, std::map<std::string, C
     std::string username = clients[fd].arg[1];
         if(!isValiduser(username))
         {
-            send_error_message(fd, "INVALIDE USERNAME\n\033[35mENTER VALID USERNAME:");
+            send_error_message(fd, "INVALIDE USERNAME\n");
             return false;
         }
         for (std::map<int, Client>::iterator jt = clients.begin(); jt != clients.end(); ++jt) {

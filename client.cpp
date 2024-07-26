@@ -5,9 +5,12 @@
 void send_file(int fd,  std::map<int,Client>& client)
 {
     if(client[fd].authfile)
-        {}
-    else if(!client[fd].authfile)
-        send_error_message(fd, "COMMAND NOT FOUND\n");
+        {
+            // client[fd].filepath;
+            //fd : when send file to user
+        }
+    // else if(!client[fd].authfile)
+    //     send_error_message(fd, "COMMAND NOT FOUND\n");
     client[fd].authfile = false;
 }
 
