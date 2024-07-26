@@ -23,7 +23,7 @@ void handle_command(int fd, std::map<int,Client>& client, std::map<std::string, 
     bool check = check_cmd(fd, client);
     if (cmd == "/send" && check)
         send_command(fd, client, chanels);
-    else if (client[fd].authfile)
+    else if (client[fd].authfile &&  cmd != "/dcc")
         send_file(fd, client);
     else if(cmd == "/privmsg" && check)
         send_message(fd, client);
@@ -58,8 +58,11 @@ void parss_data(int fd, std::map<int,Client>& client, std::string& password, std
         set_nickname(fd, client);
     else if(!client[fd].username.empty() && !client[fd].nickname.empty())
     {
-        handle_command(fd, client, chanels);
-    std::string str = BLUE  + getTimestamp() + " @" + client[fd].username + " :" RESET;
-    send(fd, str.c_str(), str.length(), 0);
+    handle_command(fd, client, chanels);
+    if(!client[fd].authfile)
+    {
+        std::string str = BLUE  + getTimestamp() + " @" + client[fd].username + " :" RESET;
+        send(fd, str.c_str(), str.length(), 0);
+    }
     }
 }
