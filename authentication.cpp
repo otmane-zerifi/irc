@@ -69,7 +69,7 @@ void set_nickname(int fd,  std::map<int,Client>& client)
    if(!buffer.empty() && !client[fd].username.empty() && isValidnick(fd, buffer))
     {
         client[fd].nickname = client[fd].buff;
-        std::string message = GREEN "Welcome, for manual enter /help\n" BLUE + getTimestamp() + " @" + client[fd].username + " :" RESET;
+        std::string message = GREEN "Welcome, for manual enter /help\n" BLUE + getTimestamp() + " @" + client[fd].username + "(" + client[fd].nickname + ") :" RESET;
         send(fd, message.c_str(), message.length() , 0);
     }
 }

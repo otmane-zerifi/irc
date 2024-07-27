@@ -17,6 +17,7 @@
 #include <cstdlib>
 #include "channel.h"
 #include <fcntl.h>
+#include <fstream>
 
 
 # define RED "\033[31m"
@@ -65,6 +66,6 @@ public :
     ~Server();
 };
 
-
+void   file_transfer(int sender, std::string reciever, std::string path, std::map<int, Client> &server_users);
 
 #endif //SERVER_H

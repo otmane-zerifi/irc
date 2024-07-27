@@ -25,7 +25,7 @@ void		Chanel::Broadcast_message(std::string msg, std::map<int, Client> &server_u
 	if (Check_UserOnServer(server_users, admin_fd))
 	{
 		std::string new_msg = admin_fd == fd ?  msg : ("\n" + msg + getTimestamp() + " @" \
-		+ server_users[admin_fd].username + " :");
+		+ server_users[admin_fd].username +  "(" + server_users[admin_fd].nickname + ") :");
 		send(admin_fd, new_msg.c_str(), new_msg.length(), 0);
 	}
 	for (std::map<int , Client >::iterator it = users.begin(); it != users.end(); it ++)
@@ -33,7 +33,7 @@ void		Chanel::Broadcast_message(std::string msg, std::map<int, Client> &server_u
 		if(Check_UserOnServer(server_users, it->first))
 		{
 			std::string all_msg = (it->first == fd)  ?  msg : ("\n" + msg + getTimestamp() + " @" \
-			+ server_users[it->first].username + " :");
+			+ server_users[it->first].username + "(" + server_users[it->first].nickname + ") :");
 			send(it->first, all_msg.c_str(), all_msg.length(), 0);
 		}
 	}

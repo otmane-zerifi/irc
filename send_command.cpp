@@ -27,7 +27,7 @@ void send_message(int fd, std::map<int , Client> client)
    if(fd_user < 0)
         return((void)send_error_message(fd, "USER NOT FOUND\n"));
    std::string message = GREEN "message from @" + client[fd].username  + " :" + get_message(client[fd].arg) + RESET;
-   std::string new_messag = (fd_user == fd) ?  message : "\n" + message + BLUE + getTimestamp() + " @" + client[fd_user].username + " :" RESET;
+   std::string new_messag = (fd_user == fd) ?  message : "\n" + message + BLUE + getTimestamp() + " @" + client[fd_user].username + "(" + client[fd_user].nickname + ") :" RESET;
    if(new_messag.empty())
         return((void)send_error_message(fd, "NO MESSAGE\n"));
    else

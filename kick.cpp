@@ -26,10 +26,13 @@ void	Chanel::kick_user(int username_fd, std::string &username_to_kick, std::map<
 	}
 	if (users.find(convert_name_to_fd(username_to_kick, server_users)) != users.end())
 	{
+		std::vector<std::string>::iterator check = std::find(list_user_invited.begin(), list_user_invited.end(), username_to_kick);
+        if (check != list_user_invited.end())
+            list_user_invited.erase(check);
 		users.erase(convert_name_to_fd(username_to_kick, server_users));
 		int fd = convert_name_to_fd(username_to_kick, server_users);
 		msg = RED "\nYou have been KICKED from " + chanel_global_name + " Channel by user " + \
-		convert_fd_to_name(username_fd, server_users) + "\n" RESET + getTimestamp() + " @" + server_users[fd].username + " :";
+		convert_fd_to_name(username_fd, server_users) + "\n" RESET + getTimestamp() + " @" + server_users[fd].username + "(" + server_users[fd].nickname + ") :";
 		send(fd, msg.c_str(), msg.length(), 0);
 	}
 	else

@@ -115,11 +115,12 @@ bool check_dcc(int fd, std::map<int , Client> &client)
     {
         client[fd_recev].authfile = true;
         client[fd_recev].filepath = client[fd].arg[3];
-        std::string message = "user @" + client[fd].username +  " want to send you a file do you want receive it yes/no:";
+        std::string message = "\nuser @" + client[fd].username +  " want to send you a file(" \
+         + client[fd].arg[3] + ") do you want receive it yes/no:";
         if(fd_recev != fd)
-            notification_user(fd_recev, "\n" + message);
-        else if(fd_recev == fd)
             notification_user(fd_recev,  message);
+        else if(fd_recev == fd)
+            notification_user(fd_recev,  "do you want receive this file(" + client[fd].arg[3] + ") yes/no:");
     }
     if(fd_recev < 0)
         return(send_error_message(fd, "User not found\n"), false);

@@ -4,13 +4,11 @@
 
 void send_file(int fd,  std::map<int,Client>& client)
 {
-    if(client[fd].authfile)
-        {
-            // client[fd].filepath;
-            //fd : when send file to user
-        }
-    // else if(!client[fd].authfile)
-    //     send_error_message(fd, "COMMAND NOT FOUND\n");
+    if(client[fd].authfile && !client[fd].arg.empty() && client[fd].arg[0] == "yes")
+    {
+        file_transfer(fd, client[fd].username, client[fd].filepath, client);
+        send(fd, "\n", 1, 0);
+    }
     client[fd].authfile = false;
 }
 
@@ -61,7 +59,7 @@ void parss_data(int fd, std::map<int,Client>& client, std::string& password, std
     handle_command(fd, client, chanels);
     if(!client[fd].authfile)
     {
-        std::string str = BLUE  + getTimestamp() + " @" + client[fd].username + " :" RESET;
+        std::string str = BLUE  + getTimestamp() + " @" + client[fd].username + "(" + client[fd].nickname + ") :" RESET;
         send(fd, str.c_str(), str.length(), 0);
     }
     }

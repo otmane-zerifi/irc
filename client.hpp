@@ -15,6 +15,7 @@ class Client {
     char buffer[1024];
     bool auth;
     bool authfile;
+    std::string recvname;
     std::string filepath;
     std::vector<std::string> arg;
     std::string buff;
