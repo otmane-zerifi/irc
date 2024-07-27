@@ -111,6 +111,9 @@ bool check_dcc(int fd, std::map<int , Client> &client)
     else if(client[fd].arg[1] != "send")
         return(send_error_message(fd, "INVALIDE ARGUMENT , USAGE /dcc send [user] [file path]\n"), false);
     int fd_recev  = fd_ofuser(client[fd].arg[2], client);
+    std::ifstream file(client[fd].arg[3].c_str());
+    if(!file)
+        return(send_error_message(fd, "PATH NOT FOUND\n"), false);
     if(fd_recev >= 0)
     {
         client[fd_recev].authfile = true;
