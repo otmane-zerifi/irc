@@ -35,7 +35,7 @@ This server supports multiple users, channels, and common IRC commands using non
 ### 1. Clone the Repository
 ```bash
 git clone https://github.com/otmane-zerifi/irc.git
-cd irc
+cd irc/src
 ```
 ### 2. Build the Project
 ```bash
